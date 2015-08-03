@@ -57,6 +57,8 @@ public:
     
     ofxPanel gui;
     ofxFloatSlider rotationX, rotationY, distance, lookAtX, lookAtY;
+    ofxToggle autoRotate;
+    ofxButton changeTarget;
     
     ofEasyCam easyCam;
     

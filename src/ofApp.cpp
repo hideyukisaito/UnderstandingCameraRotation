@@ -28,20 +28,26 @@ void ofApp::setup()
     gui.add(rotationX.setup("rotation x", 0, -180, 180));
     gui.add(rotationY.setup("rotation y", 0, -180, 180));
     gui.add(distance.setup("distance", 1000, 0, 10000));
-    gui.add(lookAtX.setup("lookAt x", 0, -500, 500));
-    gui.add(lookAtY.setup("lookAt y", 0, -500, 500));
+    gui.add(lookAtX.setup("lookAt x", 0, -1000, 1000));
+    gui.add(lookAtY.setup("lookAt y", 0, -1000, 1000));
+    gui.add(autoRotate.setup("auto rotate", false));
+    gui.add(changeTarget.setup("change target"));
 }
 
 //--------------------------------------------------------------
 void ofApp::update()
 {
+    if (autoRotate) {
+        rotationY = rotationY + 0.5;
+    }
+    
     ofQuaternion xRot(rotationX, ofVec3f(1, 0, 0));
     ofQuaternion yRot(rotationY, ofVec3f(0, 1, 0));
     ofVec3f center(0, 0, distance);
     
     cam.setPosition(center * xRot * yRot);
     
-    cam.lookAt(ofVec3f(0, 0, 0));
+    cam.lookAt(ofVec3f(lookAtX, lookAtY, 0));
     
     
     fbo1.begin();
@@ -91,6 +97,8 @@ void ofApp::update()
         ofVec3f axis;
         cam.getOrientationQuat().getRotate(angle, axis);
         
+        glEnable(GL_DEPTH_TEST);
+        
         easyCam.begin();
         {
             ofPushStyle();
@@ -131,7 +139,7 @@ void ofApp::update()
             
             ofPushMatrix();
             {
-                ofLine(cam.getPosition(), cam.getLookAtDir());
+                ofLine(cam.getPosition(), cam.getLookAtDir() + ofVec3f(lookAtX, lookAtY, 0));
                 ofLine(cam.getPosition(), cam.getPosition() + cam.getUpDir() * 500);
                 ofLine(cam.getPosition(), cam.getPosition() + cam.getSideDir() * 500);
                 
@@ -157,6 +165,8 @@ void ofApp::update()
             ofPopMatrix();
         }
         easyCam.end();
+        
+        glDisable(GL_DEPTH_TEST);
     }
     fbo2.end();
 }
